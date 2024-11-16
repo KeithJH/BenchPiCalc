@@ -6,8 +6,9 @@ Benchmark various implementations of calculating pi, focusing on threading, vect
 All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Riemann sum with various numbers of partitions.
 
 ## Implementation Notes
-* [SerialPi](./SerialPi.md): Basic serial solution without anything fancy
-* [SSE2Pi](./SSE2Pi.md): Serial solution using SSE2 vector instructions
+* [SerialPi](./notes/SerialPi.md): Basic serial solution without anything fancy
+* [SSE2Pi](./notes/SSE2Pi.md): Serial solution using SSE2 vector instructions
+* [AvxPi](./notes/AvxPi.md): Serial solution using AVX vector instructions
 
 ## Results Summary
 | Solution | -march=native | -ffast-math | time (ms) |
