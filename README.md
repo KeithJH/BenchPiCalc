@@ -7,6 +7,7 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 
 ## Implementation Notes
 * [SerialPi](./SerialPi.md): Basic serial solution without anything fancy
+* [SSE2Pi](./SSE2Pi.md): Serial solution using SSE2 vector instructions
 
 ## Results Summary
 | Solution | -march=native | -ffast-math | time (ms) |
@@ -14,6 +15,7 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 | SerialPi | yes           | yes         |   831.513 |
 | SerialPi | yes           | no          |   2213.48 |
 | SerialPi | no            | *           |   3434.23 |
+| SSE2Pi   | *             | *           | 1641.54   |
 
 ## Building
 The project is setup with `CMake` using `vcpkg` as a package manager. `Catch2` is used for testing and benchmarking.
