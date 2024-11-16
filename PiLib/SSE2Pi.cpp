@@ -20,7 +20,6 @@ double SSE2Pi(const int64_t iterations)
 	const __m128d four = _mm_set1_pd(4);
 	const __m128d lanes = _mm_set1_pd(LANES);
 
-	//double sumScalar = 0;
 	__m128d sum = _mm_setzero_pd();
 
 	// `indexes` is effectively our vectorized `i`
@@ -43,7 +42,7 @@ double SSE2Pi(const int64_t iterations)
 	}
 
 	// result = step * sum;
-	sum = _mm_mul_pd(sum, step);	
+	sum = _mm_mul_pd(sum, step);
 
 	// convert to scalar result
 	double high;

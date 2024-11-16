@@ -14,6 +14,15 @@ TEST_CASE("Pi calculation is within +/- 0.01", "[pi]")
 
 	REQUIRE_THAT(PiLib::SerialPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
 	REQUIRE_THAT(PiLib::SSE2Pi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+
+	if (PiLib::IsAvxPiSupported())
+	{
+		REQUIRE_THAT(PiLib::AvxPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+	}
+	else
+	{
+		WARN("PiLib::AvxPi not tested as it is not supported");
+	}
 }
 
 TEST_CASE("SerialPi calculation benchmark", "[!benchmark][SerialPi][pi]")
@@ -30,6 +39,20 @@ TEST_CASE("SSE2Pi calculation benchmark", "[!benchmark][SSE2Pi][pi]")
 	{
 		return PiLib::SSE2Pi(SMALL_BENCH_ITERATION_SIZE);
 	};
+}
 
+TEST_CASE("AvxPi calculation benchmark", "[!benchmark][AvxPi][pi]")
+{
+	if (PiLib::IsAvxPiSupported())
+	{
+		BENCHMARK("AvxPi")
+		{
+			return PiLib::AvxPi(SMALL_BENCH_ITERATION_SIZE);
+		};
+	}
+	else
+	{
+		WARN("PiLib::AvxPi not tested as it is not supported");
+	}
 }
 }
