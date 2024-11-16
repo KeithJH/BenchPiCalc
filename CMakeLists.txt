@@ -23,6 +23,8 @@ if (MSVC)
     set(SANITIZER_OPTIONS -fsanitize=address)
   endif ()
 else ()
+  string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+
   #add_compile_options(-march=native)
   add_compile_options(-ffast-math)
 

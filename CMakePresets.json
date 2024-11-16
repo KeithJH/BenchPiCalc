@@ -17,8 +17,7 @@
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
-      },
-      "environment": { "VCPKG_ROOT": "/opt/vcpkg" }
+      }
     },
     {
       "name": "linux-gcc-base",
@@ -43,6 +42,14 @@
       "inherits": "linux-gcc-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "linux-gcc-profile",
+      "displayName": "Linux GCC Release with debug info",
+      "inherits": "linux-gcc-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     }
   ]

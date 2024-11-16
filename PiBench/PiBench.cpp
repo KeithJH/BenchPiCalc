@@ -12,7 +12,7 @@ TEST_CASE("Pi calculation is within +/- 0.01")
 	REQUIRE_THAT(serialResult, Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
 }
 
-TEST_CASE("Pi calculation benchmark", "[!benchmark]")
+TEST_CASE("SerialPi calculation benchmark", "[!benchmark][SerialPi]")
 {
 	constexpr int64_t ITERATION_SIZE = 4026531839;
 

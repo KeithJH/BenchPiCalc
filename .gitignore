@@ -44,3 +44,7 @@ Testing/
 [._]s[a-rt-v][a-z]
 [._]ss[a-gi-z]
 [._]sw[a-p]
+
+# Perf data
+perf.data
+perf.data.old
