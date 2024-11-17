@@ -45,6 +45,11 @@ TEST_CASE("Avx512Pi calculation is within +/- 0.01", "[pi][Avx512Pi]")
 	TestPiFunction(PiLib::IsAvx512PiSupported(), PiLib::Avx512Pi, TEST_ITERATION_SIZE);
 }
 
+TEST_CASE("NaiveOmpPi calculation is within +/- 0.01", "[pi][NaiveOmpPi]")
+{
+	CHECK_THAT(PiLib::NaiveOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+}
+
 // Benchmarks
 template <typename EvaluateFunc>
 void BenchmarkPiFunction(std::string &&benchmarkName, bool isSupported, EvaluateFunc evaluateFunc,
@@ -81,5 +86,13 @@ TEST_CASE("AvxPi calculation benchmark", "[!benchmark][AvxPi][pi]")
 TEST_CASE("Avx512Pi calculation benchmark", "[!benchmark][Avx512Pi][pi]")
 {
 	BenchmarkPiFunction("Avx512Pi", PiLib::IsAvx512PiSupported(), PiLib::Avx512Pi, SMALL_BENCH_ITERATION_SIZE);
+}
+
+TEST_CASE("NaiveOmpPi calculation benchmark", "[!benchmark][NaiveOmpPi][pi]")
+{
+	BENCHMARK("NaiveOmpPi")
+	{
+		return PiLib::NaiveOmpPi(SMALL_BENCH_ITERATION_SIZE);
+	};
 }
 } // namespace PiBench

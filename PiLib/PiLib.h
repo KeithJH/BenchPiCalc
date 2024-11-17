@@ -12,4 +12,7 @@ double AvxPi(const int64_t iterations);
 
 bool IsAvx512PiSupported();
 double Avx512Pi(const int64_t iterations);
+
+double NaiveOmpPi(const int64_t iterations);
+double NaiveOmpPi(const int64_t iterations, std::size_t threadCount);
 } // namespace PiLib

@@ -10,16 +10,18 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 * [SSE2Pi](./notes/SSE2Pi.md): Serial solution using SSE2 vector instructions
 * [AvxPi](./notes/AvxPi.md): Serial solution using AVX vector instructions
 * [Avx512Pi](./notes/Avx512Pi.md): Serial solution using AVX512 vector instructions
+* [NaiveOmpPi](./notes/NaiveOmpPi.md): Parallel solution using basic Omp constructs
 
 ## Results Summary
-| Solution | -march=native | -ffast-math | time (ms) |
-|----------|---------------|-------------|-----------|
-| SerialPi | yes           | yes         |   831.513 |
-| SerialPi | yes           | no          |   2213.48 |
-| SerialPi | no            | *           |   3434.23 |
-| SSE2Pi   | *             | *           |   1641.54 |
-| AvxPi    | *             | *           |   820.518 |
-| Avx512Pi | *             | *           |   827.005 |
+| Solution   | -march=native | -ffast-math | time (ms) |
+|------------|---------------|-------------|-----------|
+| SerialPi   | yes           | yes         |   831.513 |
+| SerialPi   | yes           | no          |   2213.48 |
+| SerialPi   | no            | *           |   3434.23 |
+| SSE2Pi     | *             | *           |   1641.54 |
+| AvxPi      | *             | *           |   820.518 |
+| Avx512Pi   | *             | *           |   827.005 |
+| NaiveOmpPi | no            | *           |   439.549 |
 
 ## Building
 The project is setup with `CMake` using `vcpkg` as a package manager. `Catch2` is used for testing and benchmarking.
