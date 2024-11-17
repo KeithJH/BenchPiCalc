@@ -25,7 +25,6 @@ __attribute__((target("avx"), target("fma"))) double AvxPi(const int64_t iterati
 	const __m256d four = _mm256_set1_pd(4);
 	const __m256d lanes = four;
 
-	// double sumScalar = 0;
 	__m256d sum = _mm256_setzero_pd();
 
 	// `indexes` is effectively our vectorized `i`
