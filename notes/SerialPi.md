@@ -10,47 +10,74 @@ benchmark name                            samples    iterations          mean
 SerialPi                                         1             1     3.43423 s
 ```
 
-Nothing looks out of the ordinary with a quick `perf stat` as branches are well predicted (there's only really the loop) and we aren't really processing data from memory.
+Perf stats need a bit more investigation, but at least branches and cache look good (as there's only really the loop and no real processing from memory).
 
 ```
-$ perf stat ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 1 "[!benchmark][SerialPi]"
-...
-Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 1 [!benchmark][SerialPi]':
+$ perf stat -d ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 "[!benchmark][SerialPi]"
+ Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 [!benchmark][SerialPi]':
 
-          9,264.30 msec task-clock:u              #    1.000 CPUs utilized          
-                 0      context-switches:u        #    0.000 /sec                   
-                 0      cpu-migrations:u          #    0.000 /sec                   
-           440,141      page-faults:u             #   47.509 K/sec                  
-    50,093,796,728      cycles:u                  #    5.407 GHz                      (62.44%)
-         2,719,456      stalled-cycles-frontend:u #    0.01% frontend cycles idle     (62.47%)
-       105,716,245      stalled-cycles-backend:u  #    0.21% backend cycles idle      (62.52%)
-   111,769,520,514      instructions:u            #    2.23  insn per cycle         
-                                                  #    0.00  stalled cycles per insn  (62.56%)
-    11,469,175,739      branches:u                #    1.238 G/sec                    (62.57%)
-         5,126,395      branch-misses:u           #    0.04% of all branches          (62.52%)
-     5,757,833,717      L1-dcache-loads:u         #  621.508 M/sec                    (62.49%)
-        78,098,737      L1-dcache-load-misses:u   #    1.36% of all L1-dcache accesses  (62.44%)
-   <not supported>      LLC-loads:u                                                 
-   <not supported>      LLC-load-misses:u                                           
+         41,357.35 msec task-clock                       #    1.000 CPUs utilized             
+               147      context-switches                 #    3.554 /sec                      
+                 4      cpu-migrations                   #    0.097 /sec                      
+           420,157      page-faults                      #   10.159 K/sec                     
+   228,333,255,160      cycles                           #    5.521 GHz                         (71.43%)
+     8,285,158,134      stalled-cycles-frontend          #    3.63% frontend cycles idle        (71.43%)
+   549,300,485,416      instructions                     #    2.41  insn per cycle            
+                                                  #    0.02  stalled cycles per insn     (71.43%)
+    47,920,266,285      branches                         #    1.159 G/sec                       (71.43%)
+        80,668,178      branch-misses                    #    0.17% of all branches             (71.43%)
+     6,434,253,968      L1-dcache-loads                  #  155.577 M/sec                       (71.43%)
+       115,477,561      L1-dcache-load-misses            #    1.79% of all L1-dcache accesses   (71.43%)
+   <not supported>      LLC-loads                                                             
+   <not supported>      LLC-load-misses                                                       
 
-       9.264622253 seconds time elapsed
+      41.359781486 seconds time elapsed
 
-       8.960447000 seconds user
-       0.304015000 seconds sys
+      40.859595000 seconds user
+       0.497982000 seconds sys
+
+$ perf stat -M PipelineL2 ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 "[!benchmark][SerialPi]"
+ Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 [!benchmark][SerialPi]':
+
+        71,390,980      ex_ret_brn_misp                  #      0.0 %  bad_speculation_mispredicts
+                                                  #      0.0 %  bad_speculation_pipeline_restarts  (25.00%)
+   555,386,556,760      de_src_op_disp.all                                                      (25.00%)
+           474,686      resyncs_or_nc_redirects                                                 (25.00%)
+   228,799,322,771      ls_not_halted_cyc                                                       (25.00%)
+   554,914,348,227      ex_ret_ops                                                              (25.00%)
+     5,146,579,719      ex_no_retire.load_not_complete   #     53.1 %  backend_bound_cpu      
+                                                  #      2.5 %  backend_bound_memory     (25.00%)
+   763,314,291,096      de_no_dispatch_per_slot.backend_stalls                                        (25.00%)
+   115,004,469,145      ex_no_retire.not_complete                                               (25.00%)
+   228,759,804,488      ls_not_halted_cyc                                                       (25.00%)
+     5,510,222,951      ex_ret_ucode_ops                 #     40.0 %  retiring_fastpath      
+                                                  #      0.4 %  retiring_microcode       (24.99%)
+   228,841,683,026      ls_not_halted_cyc                                                       (24.99%)
+   555,175,764,260      ex_ret_ops                                                              (24.99%)
+    53,811,244,721      de_no_dispatch_per_slot.no_ops_from_frontend #      0.4 %  frontend_bound_bandwidth  (25.00%)
+     8,148,430,882      cpu/de_no_dispatch_per_slot.no_ops_from_frontend,cmask=0x6/ #      3.6 %  frontend_bound_latency   (25.00%)
+   228,889,915,295      ls_not_halted_cyc                                                       (25.00%)
+
+      41.416746880 seconds time elapsed
+
+      40.959431000 seconds user
+       0.453971000 seconds sys
 ```
 
-As expected, nearly all the cycles are spent inside `PiLib::SerialPi`, with the next next runner-ups looking to be related to timing.
+As expected, nearly all the cycles are spent inside `PiLib::SerialPi`
 
 ```
 $ perf report --stdio
 ...
-# Overhead  Command  Shared Object         Symbol                                                                           
-# ........  .......  ....................  .................................................................................
+# Overhead  Command  Shared Object         Symbol                                                                                                                    
+# ........  .......  ....................  ..........................................................................................................................
 #
-    76.86%  PiBench  PiBench               [.] PiLib::SerialPi
-     4.94%  PiBench  [vdso]                [.] 0x00000000000006e8
-     4.73%  PiBench  libstdc++.so.6.0.30   [.] std::chrono::_V2::steady_clock::now
-     3.69%  PiBench  libc.so.6             [.] clock_gettime@@GLIBC_2.17
+    93.97%  PiBench  PiBench               [.] PiLib::SerialPi(long)
+     3.26%  PiBench  [vdso]                [.] 0x0000000000000b00
+     0.28%  PiBench  PiBench               [.] std::vector<double, std::allocator<double> > Catch::Benchmark::Detail::resolution<std::chrono::_V2::steady_clock>(int)
+     0.21%  PiBench  PiBench               [.] Catch::Benchmark::Detail::weighted_average_quantile(int, int, double*, double*)
+     0.16%  PiBench  libstdc++.so.6.0.33   [.] std::chrono::_V2::steady_clock::now()
+     0.12%  PiBench  libc.so.6             [.] clock_gettime@@GLIBC_2.17
 ...
 ```
 
@@ -102,34 +129,58 @@ benchmark name                            samples    iterations          mean
 SerialPi                                         1             1     2.21348 s 
 ```
 
-Most metrics are the same, though there is a decrease in instructions per cycle.
+Many metrics are the same, though there is a decrease in instructions per cycle and an increase in backend_bound_cpu
 
 ```
-$ perf stat -d ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 1 "[!benchmark][SerialPi]"
-...
- Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 1 [!benchmark][SerialPi]':
+$ perf stat -d ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 "[!benchmark][SerialPi]"
+ Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 [!benchmark][SerialPi]':
 
-          6,723.54 msec task-clock:u              #    1.000 CPUs utilized          
-                 0      context-switches:u        #    0.000 /sec                   
-                 0      cpu-migrations:u          #    0.000 /sec                   
-           440,138      page-faults:u             #   65.462 K/sec                  
-    35,967,717,948      cycles:u                  #    5.350 GHz                      (62.51%)
-         2,763,711      stalled-cycles-frontend:u #    0.01% frontend cycles idle     (62.52%)
-       109,325,279      stalled-cycles-backend:u  #    0.30% backend cycles idle      (62.52%)
-    40,227,194,997      instructions:u            #    1.12  insn per cycle         
-                                                  #    0.00  stalled cycles per insn  (62.53%)
-     4,414,769,955      branches:u                #  656.614 M/sec                    (62.52%)
-         2,932,147      branch-misses:u           #    0.07% of all branches          (62.47%)
-     5,642,266,572      L1-dcache-loads:u         #  839.180 M/sec                    (62.46%)
-        72,663,951      L1-dcache-load-misses:u   #    1.29% of all L1-dcache accesses  (62.46%)
-   <not supported>      LLC-loads:u                                                 
-   <not supported>      LLC-load-misses:u                                           
+         27,018.90 msec task-clock                       #    1.000 CPUs utilized             
+               128      context-switches                 #    4.737 /sec                      
+                 1      cpu-migrations                   #    0.037 /sec                      
+           420,157      page-faults                      #   15.550 K/sec                     
+   149,168,419,586      cycles                           #    5.521 GHz                         (71.43%)
+     8,170,399,930      stalled-cycles-frontend          #    5.48% frontend cycles idle        (71.43%)
+   156,134,142,796      instructions                     #    1.05  insn per cycle            
+                                                  #    0.05  stalled cycles per insn     (71.43%)
+     9,148,719,486      branches                         #  338.604 M/sec                       (71.43%)
+        77,142,451      branch-misses                    #    0.84% of all branches             (71.43%)
+     6,387,581,691      L1-dcache-loads                  #  236.412 M/sec                       (71.43%)
+       115,902,549      L1-dcache-load-misses            #    1.81% of all L1-dcache accesses   (71.43%)
+   <not supported>      LLC-loads                                                             
+   <not supported>      LLC-load-misses                                                       
 
-       6.724447120 seconds time elapsed
+      27.020509481 seconds time elapsed
 
-       6.479510000 seconds user
-       0.243981000 seconds sys
-...
+      26.521168000 seconds user
+       0.497984000 seconds sys
+
+$ perf stat -M PipelineL2 ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 "[!benchmark][SerialPi]"
+ Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 [!benchmark][SerialPi]':
+
+        76,197,150      ex_ret_brn_misp                  #      0.1 %  bad_speculation_mispredicts
+                                                  #      0.0 %  bad_speculation_pipeline_restarts  (25.00%)
+   157,335,428,335      de_src_op_disp.all                                                      (25.00%)
+           461,947      resyncs_or_nc_redirects                                                 (25.00%)
+   149,109,802,437      ls_not_halted_cyc                                                       (25.00%)
+   156,487,685,055      ex_ret_ops                                                              (25.00%)
+     5,085,041,967      ex_no_retire.load_not_complete   #     72.2 %  backend_bound_cpu      
+                                                  #      4.2 %  backend_bound_memory     (25.00%)
+   683,430,628,457      de_no_dispatch_per_slot.backend_stalls                                        (25.00%)
+    91,463,796,122      ex_no_retire.not_complete                                               (25.00%)
+   149,083,266,597      ls_not_halted_cyc                                                       (25.00%)
+     5,481,957,355      ex_ret_ucode_ops                 #     16.9 %  retiring_fastpath      
+                                                  #      0.6 %  retiring_microcode       (25.00%)
+   149,143,519,674      ls_not_halted_cyc                                                       (25.00%)
+   156,406,748,387      ex_ret_ops                                                              (25.00%)
+    53,681,903,289      de_no_dispatch_per_slot.no_ops_from_frontend #      0.6 %  frontend_bound_bandwidth  (25.00%)
+     8,100,159,491      cpu/de_no_dispatch_per_slot.no_ops_from_frontend,cmask=0x6/ #      5.4 %  frontend_bound_latency   (25.00%)
+   149,168,167,973      ls_not_halted_cyc                                                       (25.00%)
+
+      26.992284776 seconds time elapsed
+
+      26.543459000 seconds user
+       0.446974000 seconds sys
 ```
 
 There are still many scalar instructions taking up most of the cycles, however, there are some actual vector instructions ending with `pd` ("packed double") including a `fmadd` for fused multiply and add.
@@ -171,31 +222,56 @@ benchmark name                            samples    iterations          mean
 SerialPi                                         1             1    831.513 ms
 ```
 
-With perhaps gaining some instructions per cycle back.
+With perhaps gaining some instructions per cycle back but an increase in frontend_bound_latency
 ```
-$ perf stat -d ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 1 "[!benchmark][SerialPi]"
- Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 1 [!benchmark][SerialPi]':
+$ perf stat -d ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 "[!benchmark][SerialPi]"
+ Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 [!benchmark][SerialPi]':
 
-          3,936.98 msec task-clock:u              #    1.000 CPUs utilized          
-                 0      context-switches:u        #    0.000 /sec                   
-                 0      cpu-migrations:u          #    0.000 /sec                   
-           420,142      page-faults:u             #  106.717 K/sec                  
-    20,354,103,205      cycles:u                  #    5.170 GHz                      (62.51%)
-         2,467,222      stalled-cycles-frontend:u #    0.01% frontend cycles idle     (62.51%)
-        87,636,125      stalled-cycles-backend:u  #    0.43% backend cycles idle      (62.51%)
-    25,533,521,687      instructions:u            #    1.25  insn per cycle         
-                                                  #    0.00  stalled cycles per insn  (62.51%)
-     4,317,423,623      branches:u                #    1.097 G/sec                    (62.51%)
-         7,771,863      branch-misses:u           #    0.18% of all branches          (62.48%)
-     5,559,869,732      L1-dcache-loads:u         #    1.412 G/sec                    (62.48%)
-        71,591,296      L1-dcache-load-misses:u   #    1.29% of all L1-dcache accesses  (62.48%)
-   <not supported>      LLC-loads:u                                                 
-   <not supported>      LLC-load-misses:u                                           
+         11,708.24 msec task-clock                       #    1.000 CPUs utilized             
+                53      context-switches                 #    4.527 /sec                      
+                 0      cpu-migrations                   #    0.000 /sec                      
+           420,157      page-faults                      #   35.886 K/sec                     
+    64,638,360,775      cycles                           #    5.521 GHz                         (71.42%)
+     7,954,397,398      stalled-cycles-frontend          #   12.31% frontend cycles idle        (71.42%)
+    78,248,045,518      instructions                     #    1.21  insn per cycle            
+                                                  #    0.10  stalled cycles per insn     (71.43%)
+     9,039,585,506      branches                         #  772.071 M/sec                       (71.43%)
+        67,472,744      branch-misses                    #    0.75% of all branches             (71.43%)
+     6,164,254,509      L1-dcache-loads                  #  526.489 M/sec                       (71.44%)
+       108,870,491      L1-dcache-load-misses            #    1.77% of all L1-dcache accesses   (71.43%)
+   <not supported>      LLC-loads                                                             
+   <not supported>      LLC-load-misses                                                       
 
-       3.937230757 seconds time elapsed
+      11.709396590 seconds time elapsed
 
-       3.601089000 seconds user
-       0.336101000 seconds sys
+      11.231407000 seconds user
+       0.476974000 seconds sys
+$ perf stat -M PipelineL2 ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 "[!benchmark][SerialPi]"
+ Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 [!benchmark][SerialPi]':
+
+        71,869,268      ex_ret_brn_misp                  #      0.2 %  bad_speculation_mispredicts
+                                                  #      0.0 %  bad_speculation_pipeline_restarts  (25.00%)
+    79,617,320,810      de_src_op_disp.all                                                      (25.00%)
+           461,373      resyncs_or_nc_redirects                                                 (25.00%)
+    64,868,259,823      ls_not_halted_cyc                                                       (25.00%)
+    78,739,407,632      ex_ret_ops                                                              (25.00%)
+     5,016,783,031      ex_no_retire.load_not_complete   #     54.4 %  backend_bound_cpu      
+                                                  #      6.7 %  backend_bound_memory     (25.00%)
+   238,025,025,275      de_no_dispatch_per_slot.backend_stalls                                        (25.00%)
+    45,579,219,995      ex_no_retire.not_complete                                               (25.00%)
+    64,855,676,073      ls_not_halted_cyc                                                       (25.00%)
+     5,447,092,462      ex_ret_ucode_ops                 #     18.8 %  retiring_fastpath      
+                                                  #      1.4 %  retiring_microcode       (24.99%)
+    64,879,369,971      ls_not_halted_cyc                                                       (24.99%)
+    78,751,066,062      ex_ret_ops                                                              (24.99%)
+    71,408,783,951      de_no_dispatch_per_slot.no_ops_from_frontend #      6.1 %  frontend_bound_bandwidth  (25.00%)
+     7,933,105,359      cpu/de_no_dispatch_per_slot.no_ops_from_frontend,cmask=0x6/ #     12.2 %  frontend_bound_latency   (25.00%)
+    64,893,763,604      ls_not_halted_cyc                                                       (25.00%)
+
+      11.743191364 seconds time elapsed
+
+      11.251013000 seconds user
+       0.490956000 seconds sys
 ```
 
 But most importantly, more reliance on actual vector instructions!

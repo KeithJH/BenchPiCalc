@@ -14,26 +14,52 @@ As intrinsics are directly used there is little difference in the compiler flags
 $ perf stat -d ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 "[!benchmark][Avx512Pi]"
  Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 [!benchmark][Avx512Pi]':
 
-         11,425.51 msec task-clock:u              #    1.000 CPUs utilized          
-                 0      context-switches:u        #    0.000 /sec                   
-                 0      cpu-migrations:u          #    0.000 /sec                   
-           440,143      page-faults:u             #   38.523 K/sec                  
-    61,964,935,828      cycles:u                  #    5.423 GHz                      (62.51%)
-         2,730,870      stalled-cycles-frontend:u #    0.00% frontend cycles idle     (62.51%)
-       103,852,953      stalled-cycles-backend:u  #    0.17% backend cycles idle      (62.51%)
-    59,386,731,613      instructions:u            #    0.96  insn per cycle         
-                                                  #    0.00  stalled cycles per insn  (62.50%)
-     8,980,599,571      branches:u                #  786.013 M/sec                    (62.51%)
-         7,394,460      branch-misses:u           #    0.08% of all branches          (62.49%)
-     5,769,329,491      L1-dcache-loads:u         #  504.951 M/sec                    (62.49%)
-        76,275,377      L1-dcache-load-misses:u   #    1.32% of all L1-dcache accesses  (62.49%)
-   <not supported>      LLC-loads:u                                                 
-   <not supported>      LLC-load-misses:u                                           
+         19,110.87 msec task-clock                       #    1.000 CPUs utilized             
+                64      context-switches                 #    3.349 /sec                      
+                 2      cpu-migrations                   #    0.105 /sec                      
+           420,158      page-faults                      #   21.985 K/sec                     
+   105,508,569,005      cycles                           #    5.521 GHz                         (71.42%)
+     8,017,030,521      stalled-cycles-frontend          #    7.60% frontend cycles idle        (71.43%)
+    97,956,848,664      instructions                     #    0.93  insn per cycle            
+                                                  #    0.08  stalled cycles per insn     (71.43%)
+    13,610,372,324      branches                         #  712.180 M/sec                       (71.43%)
+        68,562,234      branch-misses                    #    0.50% of all branches             (71.43%)
+     6,196,380,537      L1-dcache-loads                  #  324.233 M/sec                       (71.43%)
+       110,569,793      L1-dcache-load-misses            #    1.78% of all L1-dcache accesses   (71.43%)
+   <not supported>      LLC-loads                                                             
+   <not supported>      LLC-load-misses                                                       
 
-      11.425801767 seconds time elapsed
+      19.112972381 seconds time elapsed
 
-      11.177638000 seconds user
-       0.248036000 seconds sys
+      18.592124000 seconds user
+       0.518947000 seconds sys
+
+$ perf stat -M PipelineL2 ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 "[!benchmark][Avx512Pi]"
+ Performance counter stats for './out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 10 [!benchmark][Avx512Pi]':
+
+        73,846,352      ex_ret_brn_misp                  #      0.2 %  bad_speculation_mispredicts
+                                                  #      0.0 %  bad_speculation_pipeline_restarts  (25.00%)
+    95,052,506,441      de_src_op_disp.all                                                      (25.00%)
+           463,234      resyncs_or_nc_redirects                                                 (25.00%)
+   105,619,833,379      ls_not_halted_cyc                                                       (25.00%)
+    93,943,579,125      ex_ret_ops                                                              (25.00%)
+     5,036,308,790      ex_no_retire.load_not_complete   #     71.5 %  backend_bound_cpu      
+                                                  #      4.4 %  backend_bound_memory     (25.00%)
+   480,522,837,700      de_no_dispatch_per_slot.backend_stalls                                        (25.00%)
+    87,389,897,172      ex_no_retire.not_complete                                               (25.00%)
+   105,598,034,281      ls_not_halted_cyc                                                       (25.00%)
+     5,447,384,862      ex_ret_ucode_ops                 #     14.0 %  retiring_fastpath      
+                                                  #      0.9 %  retiring_microcode       (25.00%)
+   105,641,921,876      ls_not_halted_cyc                                                       (25.00%)
+    93,938,664,040      ex_ret_ops                                                              (25.00%)
+    57,773,673,933      de_no_dispatch_per_slot.no_ops_from_frontend #      1.6 %  frontend_bound_bandwidth  (25.00%)
+     7,987,372,736      cpu/de_no_dispatch_per_slot.no_ops_from_frontend,cmask=0x6/ #      7.6 %  frontend_bound_latency   (25.00%)
+   105,661,601,675      ls_not_halted_cyc                                                       (25.00%)
+
+      19.119576664 seconds time elapsed
+
+      18.631119000 seconds user
+       0.486976000 seconds sys
 ```
 
 As expected the bulk of the work is done by vector instructions in the hot loop. Notably there isn't any loop unrolling, which would be intriguing to explore if/how much that would help.
