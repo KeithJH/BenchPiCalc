@@ -10,23 +10,25 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 * [SSE2Pi](./notes/SSE2Pi.md): Serial solution using SSE2 vector instructions
 * [AvxPi](./notes/AvxPi.md): Serial solution using AVX vector instructions
 * [Avx512Pi](./notes/Avx512Pi.md): Serial solution using AVX512 vector instructions
-* [NaiveOmpPi](./notes/NaiveOmpPi.md): Parallel solution using basic Omp constructs
+* [NaiveOmpPi](./notes/NaiveOmpPi.md): Parallel solution using basic OpenMP constructs
+* [FalseSharingOmpPi](./notes/FalseSharingOmpPi.md): Parallel solution using basic OpenMP constructs, but causing a false sharing issue
 
 ## Results Summary
-| Solution   | -march=native | -ffast-math | time (ms) |
-|------------|---------------|-------------|-----------|
-| SerialPi   | yes           | yes         |   831.513 |
-| SerialPi   | yes           | no          |   2213.48 |
-| SerialPi   | no            | *           |   3434.23 |
-| SSE2Pi     | *             | *           |   1641.54 |
-| AvxPi      | *             | *           |   820.518 |
-| Avx512Pi   | *             | *           |   827.005 |
-| NaiveOmpPi | no            | *           |   439.549 |
+| Solution          | -march=native | -ffast-math | time (ms) |
+|-------------------|---------------|-------------|-----------|
+| SerialPi          | yes           | yes         |   831.513 |
+| SerialPi          | yes           | no          |   2213.48 |
+| SerialPi          | no            | *           |   3434.23 |
+| SSE2Pi            | *             | *           |   1641.54 |
+| AvxPi             | *             | *           |   820.518 |
+| Avx512Pi          | *             | *           |   827.005 |
+| NaiveOmpPi        | no            | *           |   439.549 |
+| FalseSharingOmpPi | no            | *           |   6803.25 |
 
 ## Building
 The project is setup with `CMake` using `vcpkg` as a package manager. `Catch2` is used for testing and benchmarking.
 
-Presets are created for `g++` as that is the compiler everything is currently test with. This includes:
+Presets are created for `g++` as that is the compiler everything is currently test with. The "linux-gcc-profile" preset is meant to be just as optimized as the "release" preset but with debug information, however, on some machines (Intel CPUs?) this causes some performance issues.
 ```
 $ cmake --list-presets
 Available configure presets:
@@ -34,7 +36,6 @@ Available configure presets:
   "linux-gcc-debug"   - Linux GCC Debug
   "linux-gcc-release" - Linux GCC Release
   "linux-gcc-profile" - Linux GCC Release with debug info
-
 ```
 
 The project can be configured with:
@@ -54,7 +55,7 @@ $ ./out/build/linux-gcc-profile/PiBench/PiBench [common Catch2 args to control w
 ```
 In particular the following arguments are a good starting point for running benchmarks, as they are skipped by default:
 ```
-$ ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 1 "[!benchmark]
+$ ./out/build/linux-gcc-profile/PiBench/PiBench --benchmark-no-analysis --benchmark-samples 1 "[!benchmark]"
 Filters: [!benchmark]
 Randomness seeded to: 2212001003
 

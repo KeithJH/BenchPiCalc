@@ -50,6 +50,11 @@ TEST_CASE("NaiveOmpPi calculation is within +/- 0.01", "[pi][NaiveOmpPi]")
 	CHECK_THAT(PiLib::NaiveOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
 }
 
+TEST_CASE("FalseSharingOmpPi calculation is within +/- 0.01", "[pi][FalseSharingOmpPi]")
+{
+	CHECK_THAT(PiLib::FalseSharingOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+}
+
 // Benchmarks
 template <typename EvaluateFunc>
 void BenchmarkPiFunction(std::string &&benchmarkName, bool isSupported, EvaluateFunc evaluateFunc,
@@ -93,6 +98,14 @@ TEST_CASE("NaiveOmpPi calculation benchmark", "[!benchmark][NaiveOmpPi][pi]")
 	BENCHMARK("NaiveOmpPi")
 	{
 		return PiLib::NaiveOmpPi(SMALL_BENCH_ITERATION_SIZE);
+	};
+}
+
+TEST_CASE("FalseSharingOmpPi calculation benchmark", "[!benchmark][FalseSharingOmpPi][pi]")
+{
+	BENCHMARK("FalseSharingOmpPi")
+	{
+		return PiLib::FalseSharingOmpPi(SMALL_BENCH_ITERATION_SIZE);
 	};
 }
 } // namespace PiBench

@@ -2,7 +2,7 @@
 
 find_package(OpenMP)
 
-add_library (PiLib "SerialPi.cpp" "SSE2Pi.cpp" "AvxPi.cpp" "Avx512Pi.cpp" "NaiveOmpPi.cpp" "PiLib.h")
+add_library (PiLib "SerialPi.cpp" "SSE2Pi.cpp" "AvxPi.cpp" "Avx512Pi.cpp" "NaiveOmpPi.cpp" "FalseSharingOmpPi.cpp" "PiLib.h")
 target_link_libraries(PiLib PRIVATE OpenMP::OpenMP_CXX)
 target_compile_options(PiLib PRIVATE ${WARNING_OPTIONS})
 target_compile_options(PiLib PRIVATE ${SANITIZER_OPTIONS})

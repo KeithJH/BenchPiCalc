@@ -15,4 +15,7 @@ double Avx512Pi(const int64_t iterations);
 
 double NaiveOmpPi(const int64_t iterations);
 double NaiveOmpPi(const int64_t iterations, std::size_t threadCount);
+
+double FalseSharingOmpPi(const int64_t iterations);
+double FalseSharingOmpPi(const int64_t iterations, std::size_t threadCount);
 } // namespace PiLib
