@@ -45,14 +45,25 @@ TEST_CASE("Avx512Pi calculation is within +/- 0.01", "[pi][Avx512Pi]")
 	TestPiFunction(PiLib::IsAvx512PiSupported(), PiLib::Avx512Pi, TEST_ITERATION_SIZE);
 }
 
-TEST_CASE("NaiveOmpPi calculation is within +/- 0.01", "[pi][NaiveOmpPi]")
+TEST_CASE("NaiveOmpPi calculation is within +/- 0.01", "[pi][Omp][NaiveOmpPi]")
 {
 	CHECK_THAT(PiLib::NaiveOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
 }
 
-TEST_CASE("FalseSharingOmpPi calculation is within +/- 0.01", "[pi][FalseSharingOmpPi]")
+TEST_CASE("FalseSharingOmpPi calculation is within +/- 0.01", "[pi][Omp][FalseSharingOmpPi]")
 {
 	CHECK_THAT(PiLib::FalseSharingOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+}
+
+TEST_CASE("AtomicOmpPi calculation is within +/- 0.01", "[pi][Omp][AtomicOmpPi]")
+{
+	CHECK_THAT(PiLib::AtomicOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+}
+
+
+TEST_CASE("ForOmpPi calculation is within +/- 0.01", "[pi][Omp][ForOmpPi]")
+{
+	CHECK_THAT(PiLib::ForOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
 }
 
 // Benchmarks
@@ -93,7 +104,7 @@ TEST_CASE("Avx512Pi calculation benchmark", "[!benchmark][Avx512Pi][pi]")
 	BenchmarkPiFunction("Avx512Pi", PiLib::IsAvx512PiSupported(), PiLib::Avx512Pi, SMALL_BENCH_ITERATION_SIZE);
 }
 
-TEST_CASE("NaiveOmpPi calculation benchmark", "[!benchmark][NaiveOmpPi][pi]")
+TEST_CASE("NaiveOmpPi calculation benchmark", "[!benchmark][NaiveOmpPi][Omp][pi]")
 {
 	BENCHMARK("NaiveOmpPi")
 	{
@@ -101,11 +112,27 @@ TEST_CASE("NaiveOmpPi calculation benchmark", "[!benchmark][NaiveOmpPi][pi]")
 	};
 }
 
-TEST_CASE("FalseSharingOmpPi calculation benchmark", "[!benchmark][FalseSharingOmpPi][pi]")
+TEST_CASE("FalseSharingOmpPi calculation benchmark", "[!benchmark][FalseSharingOmpPi][Omp][pi]")
 {
 	BENCHMARK("FalseSharingOmpPi")
 	{
 		return PiLib::FalseSharingOmpPi(SMALL_BENCH_ITERATION_SIZE);
+	};
+}
+
+TEST_CASE("AtomicOmpPi calculation benchmark", "[!benchmark][AtomicOmpPi][Omp][pi]")
+{
+	BENCHMARK("AtomicOmpPi")
+	{
+		return PiLib::AtomicOmpPi(SMALL_BENCH_ITERATION_SIZE);
+	};
+}
+
+TEST_CASE("ForOmpPi calculation benchmark", "[!benchmark][ForOmpPi][Omp][pi]")
+{
+	BENCHMARK("ForOmpPi")
+	{
+		return PiLib::ForOmpPi(SMALL_BENCH_ITERATION_SIZE);
 	};
 }
 } // namespace PiBench

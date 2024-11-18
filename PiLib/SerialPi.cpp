@@ -1,3 +1,5 @@
+#include <numbers>
+
 #include "PiLib.h"
 
 namespace PiLib

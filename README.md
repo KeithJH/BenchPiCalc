@@ -12,6 +12,8 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 * [Avx512Pi](./notes/Avx512Pi.md): Serial solution using AVX512 vector instructions
 * [NaiveOmpPi](./notes/NaiveOmpPi.md): Parallel solution using basic OpenMP constructs
 * [FalseSharingOmpPi](./notes/FalseSharingOmpPi.md): Parallel solution using basic OpenMP constructs, but causing a false sharing issue
+* [AtomicOmpPi](./notes/AtomicOmpPi.md): Parallel solution using basic OpenMP constructs, including an atomic for sum increment
+* [ForOmpPi](./notes/ForOmpPi.md): Parallel solution using an OpenMP parallel for loop with a reduction clause for sum
 
 ## Results Summary
 | Solution          | -march=native | -ffast-math | time (ms) |
@@ -24,6 +26,10 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 | Avx512Pi          | *             | *           |   827.005 |
 | NaiveOmpPi        | no            | *           |   439.549 |
 | FalseSharingOmpPi | no            | *           |   6803.25 |
+| AtomicOmpPi       | no            | *           |   446.516 |
+| ForOmpPi          | no            | *           |   447.340 |
+| ForOmpPi          | yes           | no          |   154.168 |
+| ForOmpPi          | yes           | yes         |   103.906 |
 
 ## Building
 The project is setup with `CMake` using `vcpkg` as a package manager. `Catch2` is used for testing and benchmarking.

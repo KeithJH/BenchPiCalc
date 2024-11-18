@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <numbers>
 
 namespace PiLib
 {
@@ -18,4 +17,10 @@ double NaiveOmpPi(const int64_t iterations, std::size_t threadCount);
 
 double FalseSharingOmpPi(const int64_t iterations);
 double FalseSharingOmpPi(const int64_t iterations, std::size_t threadCount);
+
+double AtomicOmpPi(const int64_t iterations);
+double AtomicOmpPi(const int64_t iterations, std::size_t threadCount);
+
+double ForOmpPi(const int64_t iterations);
+double ForOmpPi(const int64_t iterations, std::size_t threadCount);
 } // namespace PiLib
