@@ -16,7 +16,7 @@ __attribute__((target("avx"), target("fma"))) double AvxPi(const int64_t iterati
 
 	// We will do at least `iterations`, but may do more to avoid
 	// doing any scalar "tail" computations
-	const int64_t loopCount = (iterations / LANES) + (iterations % LANES > 0 ? 1 : 0);
+	const int64_t loopCount = (iterations / LANES) + (iterations % LANES != 0);
 	const double stepScalar = 1 / static_cast<double>(loopCount * LANES);
 
 	// Broadcast reused scalar values for vector math

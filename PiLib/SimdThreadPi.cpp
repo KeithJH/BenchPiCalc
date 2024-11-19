@@ -53,7 +53,7 @@ double SimdThreadPi(const int64_t iterations, const std::size_t threadCount)
 	assert(threadCount > 0);
 
 	constexpr int LANES = 512 / 8 / sizeof(double);
-	const int64_t totalLoopCount = std::ceil(iterations / LANES);
+	const int64_t totalLoopCount = (iterations / LANES) + (iterations % LANES != 0);
 	const int64_t perThreadLoopCount = totalLoopCount / threadCount;
 	const double stepScalar = 1 / static_cast<double>(totalLoopCount * LANES);
 
