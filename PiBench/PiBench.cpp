@@ -60,10 +60,14 @@ TEST_CASE("AtomicOmpPi calculation is within +/- 0.01", "[pi][Omp][AtomicOmpPi]"
 	CHECK_THAT(PiLib::AtomicOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
 }
 
-
 TEST_CASE("ForOmpPi calculation is within +/- 0.01", "[pi][Omp][ForOmpPi]")
 {
 	CHECK_THAT(PiLib::ForOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+}
+
+TEST_CASE("ThreadPi calculation is within +/- 0.01", "[pi][ThreadPi]")
+{
+	CHECK_THAT(PiLib::ThreadPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
 }
 
 // Benchmarks
@@ -133,6 +137,14 @@ TEST_CASE("ForOmpPi calculation benchmark", "[!benchmark][ForOmpPi][Omp][pi]")
 	BENCHMARK("ForOmpPi")
 	{
 		return PiLib::ForOmpPi(SMALL_BENCH_ITERATION_SIZE);
+	};
+}
+
+TEST_CASE("ThreadPi calculation benchmark", "[!benchmark][ThreadPi][pi]")
+{
+	BENCHMARK("ThreadPi")
+	{
+		return PiLib::ThreadPi(SMALL_BENCH_ITERATION_SIZE);
 	};
 }
 } // namespace PiBench

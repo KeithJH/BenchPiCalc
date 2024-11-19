@@ -14,22 +14,26 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 * [FalseSharingOmpPi](./notes/FalseSharingOmpPi.md): Parallel solution using basic OpenMP constructs, but causing a false sharing issue
 * [AtomicOmpPi](./notes/AtomicOmpPi.md): Parallel solution using basic OpenMP constructs, including an atomic for sum increment
 * [ForOmpPi](./notes/ForOmpPi.md): Parallel solution using an OpenMP parallel for loop with a reduction clause for sum
+* [ThreadPi](./notes/ThreadPi.md): Parallel solution manually using `std::thread`
 
 ## Results Summary
-| Solution          | -march=native | -ffast-math | time (ms) |
-|-------------------|---------------|-------------|-----------|
-| SerialPi          | yes           | yes         |   831.513 |
-| SerialPi          | yes           | no          |   2213.48 |
-| SerialPi          | no            | *           |   3434.23 |
-| SSE2Pi            | *             | *           |   1641.54 |
-| AvxPi             | *             | *           |   820.518 |
-| Avx512Pi          | *             | *           |   827.005 |
-| NaiveOmpPi        | no            | *           |   439.549 |
-| FalseSharingOmpPi | no            | *           |   6803.25 |
-| AtomicOmpPi       | no            | *           |   446.516 |
-| ForOmpPi          | no            | *           |   447.340 |
-| ForOmpPi          | yes           | no          |   154.168 |
-| ForOmpPi          | yes           | yes         |   103.906 |
+4026531839 Iterations on an AMD Ryzen 7 7700X
+
+| Solution          | threads | -march=native | -ffast-math | time (ms) |
+|-------------------|---------|---------------|-------------|-----------|
+| SerialPi          | 1       | yes           | yes         |   831.513 |
+| SerialPi          | 1       | yes           | no          |   2213.48 |
+| SerialPi          | 1       | no            | *           |   3434.23 |
+| SSE2Pi            | 1       | *             | *           |   1641.54 |
+| AvxPi             | 1       | *             | *           |   820.518 |
+| Avx512Pi          | 1       | *             | *           |   827.005 |
+| NaiveOmpPi        | 16      | no            | *           |   439.549 |
+| FalseSharingOmpPi | 16      | no            | *           |   6803.25 |
+| AtomicOmpPi       | 16      | no            | *           |   446.516 |
+| ForOmpPi          | 16      | no            | *           |   447.340 |
+| ForOmpPi          | 16      | yes           | no          |   154.168 |
+| ForOmpPi          | 16      | yes           | yes         |   103.906 |
+| ThreadPi          | 16      | yes           | *           |   413.089 |
 
 ## Building
 The project is setup with `CMake` using `vcpkg` as a package manager. `Catch2` is used for testing and benchmarking.
