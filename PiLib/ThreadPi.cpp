@@ -8,12 +8,12 @@ namespace PiLib
 {
 void Thunk(const int64_t iterations, std::size_t threadId, std::size_t threadCount, std::atomic<double> &globalSum)
 {
-	double localSum {0};
+	double localSum{0};
 	double step = 1 / static_cast<double>(iterations);
 
 	// Split the work between threads by having a stride of `threadCount` and starting at
 	// `threadId`. Since there's no memory access we don't have to worry about any cache
-	// locallity issues or anything.
+	// locality issues or anything.
 	for (int64_t i = threadId; i < iterations; i += threadCount)
 	{
 		const double x = (i + 0.5) * step;
@@ -33,7 +33,7 @@ double ThreadPi(const int64_t iterations, const std::size_t threadCount)
 	assert(threadCount > 0);
 
 	std::vector<std::thread> threads;
-	std::atomic<double> sum {0};
+	std::atomic<double> sum{0};
 
 	// Start `threadCount - 1` threads as this thread will do work as well
 	threads.reserve(threadCount - 1);

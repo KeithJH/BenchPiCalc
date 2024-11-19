@@ -52,7 +52,8 @@ TEST_CASE("NaiveOmpPi calculation is within +/- 0.01", "[pi][Omp][NaiveOmpPi]")
 
 TEST_CASE("FalseSharingOmpPi calculation is within +/- 0.01", "[pi][Omp][FalseSharingOmpPi]")
 {
-	CHECK_THAT(PiLib::FalseSharingOmpPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+	CHECK_THAT(PiLib::FalseSharingOmpPi(TEST_ITERATION_SIZE),
+	           Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
 }
 
 TEST_CASE("AtomicOmpPi calculation is within +/- 0.01", "[pi][Omp][AtomicOmpPi]")
@@ -68,6 +69,13 @@ TEST_CASE("ForOmpPi calculation is within +/- 0.01", "[pi][Omp][ForOmpPi]")
 TEST_CASE("ThreadPi calculation is within +/- 0.01", "[pi][ThreadPi]")
 {
 	CHECK_THAT(PiLib::ThreadPi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+}
+
+TEST_CASE("SimdThreadPi calculation is within +/- 0.01", "[pi][SimdThreadPi]")
+{
+	// TODO: There's probably a cleaner way...
+	double (*simdThreadPi)(int64_t) = PiLib::SimdThreadPi;
+	TestPiFunction(PiLib::IsSimdThreadPiSupported(), simdThreadPi, TEST_ITERATION_SIZE);
 }
 
 // Benchmarks
@@ -146,5 +154,11 @@ TEST_CASE("ThreadPi calculation benchmark", "[!benchmark][ThreadPi][pi]")
 	{
 		return PiLib::ThreadPi(SMALL_BENCH_ITERATION_SIZE);
 	};
+}
+
+TEST_CASE("SimdThreadPi calculation benchmark", "[!benchmark][SimdThreadPi][pi]")
+{
+	double (*simdThreadPi)(int64_t) = PiLib::SimdThreadPi;
+	BenchmarkPiFunction("SimdThreadPi", PiLib::IsSimdThreadPiSupported(), simdThreadPi, SMALL_BENCH_ITERATION_SIZE);
 }
 } // namespace PiBench

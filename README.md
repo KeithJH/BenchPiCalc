@@ -15,6 +15,7 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 * [AtomicOmpPi](./notes/AtomicOmpPi.md): Parallel solution using basic OpenMP constructs, including an atomic for sum increment
 * [ForOmpPi](./notes/ForOmpPi.md): Parallel solution using an OpenMP parallel for loop with a reduction clause for sum
 * [ThreadPi](./notes/ThreadPi.md): Parallel solution manually using `std::thread`
+* [SimdThreadPi](./notes/SimdThreadPi.md): Parallel solution manually using `std::thread` and AVX512 vector instructions
 
 ## Results Summary
 4026531839 Iterations on an AMD Ryzen 7 7700X
@@ -34,6 +35,7 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 | ForOmpPi          | 16      | yes           | no          |   154.168 |
 | ForOmpPi          | 16      | yes           | yes         |   103.906 |
 | ThreadPi          | 16      | yes           | *           |   413.089 |
+| SimdThreadPi      | 16      | *             | *           |   104.933 |
 
 ## Building
 The project is setup with `CMake` using `vcpkg` as a package manager. `Catch2` is used for testing and benchmarking.

@@ -26,4 +26,8 @@ double ForOmpPi(const int64_t iterations, std::size_t threadCount);
 
 double ThreadPi(const int64_t iterations);
 double ThreadPi(const int64_t iterations, std::size_t threadCount);
+
+bool IsSimdThreadPiSupported();
+double SimdThreadPi(const int64_t iterations);
+double SimdThreadPi(const int64_t iterations, std::size_t threadCount);
 } // namespace PiLib
