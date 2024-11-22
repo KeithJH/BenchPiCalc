@@ -48,6 +48,7 @@ double KomputePi(const std::size_t iterations, const uint32_t deviceIndex)
 
 	manager.sequence()
 		->record<kp::OpAlgoDispatch>(partialSumAlgo)
+		->eval()
 		->record<kp::OpAlgoDispatch>(reduceAlgo, partialSize)
 		->record<kp::OpSyncLocal>({resultTensor})
 		->eval();
