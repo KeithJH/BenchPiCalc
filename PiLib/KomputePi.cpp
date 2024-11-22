@@ -10,21 +10,26 @@
 
 namespace PiLib
 {
-double KomputePi(const int64_t iterations, const int32_t deviceIndex)
+double KomputePi(const std::size_t iterations, const uint32_t deviceIndex)
 {
-	constexpr unsigned SHADER_LOCAL_SIZE = 1024;
-	constexpr unsigned MAX_GROUP_SIZE = 65535;
+	constexpr std::size_t SHADER_LOCAL_SIZE = 1024;
+	constexpr std::size_t MAX_GROUP_SIZE = 65535;
 
 	kp::Manager manager(deviceIndex);
 
-	const unsigned totalWorkGroupCount = (iterations / SHADER_LOCAL_SIZE) + (iterations % SHADER_LOCAL_SIZE != 0);
-	unsigned dimensionCountX = totalWorkGroupCount;
-	unsigned dimensionCountY = 1;
+	const std::size_t totalWorkGroupCount = (iterations / SHADER_LOCAL_SIZE) + (iterations % SHADER_LOCAL_SIZE != 0);
+	unsigned dimensionCountX;
+	unsigned dimensionCountY;
 
 	if (totalWorkGroupCount > MAX_GROUP_SIZE)
 	{
 		dimensionCountX = MAX_GROUP_SIZE;
-		dimensionCountY = (totalWorkGroupCount / MAX_GROUP_SIZE) + (totalWorkGroupCount % MAX_GROUP_SIZE != 0);
+		dimensionCountY = static_cast<unsigned>(totalWorkGroupCount / MAX_GROUP_SIZE) + (totalWorkGroupCount % MAX_GROUP_SIZE != 0);
+	}
+	else
+	{
+		dimensionCountX = static_cast<unsigned>(totalWorkGroupCount);
+		dimensionCountY = 1;
 	}
 
 	const kp::Workgroup workgroup{dimensionCountX, dimensionCountY};
@@ -56,7 +61,7 @@ double KomputePi(const int64_t iterations, const int32_t deviceIndex)
 	return pi;
 }
 
-double KomputePi(const int64_t iterations)
+double KomputePi(const std::size_t iterations)
 {
 	return KomputePi(iterations, 0);
 }

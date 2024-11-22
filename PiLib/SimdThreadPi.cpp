@@ -13,7 +13,7 @@ bool IsSimdThreadPiSupported()
 	return __builtin_cpu_supports("avx512f");
 }
 
-[[gnu::target("avx512f")]] void SimdThunk(const int64_t loopCountStart, const int64_t loopCountEnd,
+[[gnu::target("avx512f")]] void SimdThunk(const std::size_t loopCountStart, const std::size_t loopCountEnd,
                                           const double stepScalar, std::atomic<double> &globalSum)
 {
 	constexpr int LANES = 512 / 8 / sizeof(double);
@@ -21,14 +21,14 @@ bool IsSimdThreadPiSupported()
 	const __m512d one = _mm512_set1_pd(1);
 	const __m512d four = _mm512_set1_pd(4);
 	const __m512d lanes = _mm512_set1_pd(LANES);
-	const __m512d startOffset = _mm512_set1_pd(static_cast<double>(LANES) * loopCountStart);
+	const __m512d startOffset = _mm512_set1_pd(static_cast<double>(LANES) * static_cast<double>(loopCountStart));
 
 	__m512d sum = _mm512_setzero_pd();
 
 	__m512d indexes = _mm512_set_pd(0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5);
 	indexes = _mm512_add_pd(indexes, startOffset);
 
-	for (int64_t i = loopCountStart; i < loopCountEnd; i++)
+	for (std::size_t i = loopCountStart; i < loopCountEnd; i++)
 	{
 		__m512d working = indexes;
 		working = _mm512_mul_pd(working, step);
@@ -43,18 +43,18 @@ bool IsSimdThreadPiSupported()
 	globalSum += _mm512_reduce_add_pd(sum);
 }
 
-double SimdThreadPi(const int64_t iterations)
+double SimdThreadPi(const std::size_t iterations)
 {
 	return SimdThreadPi(iterations, std::thread::hardware_concurrency());
 }
 
-double SimdThreadPi(const int64_t iterations, const std::size_t threadCount)
+double SimdThreadPi(const std::size_t iterations, const std::size_t threadCount)
 {
 	assert(threadCount > 0);
 
 	constexpr int LANES = 512 / 8 / sizeof(double);
-	const int64_t totalLoopCount = (iterations / LANES) + (iterations % LANES != 0);
-	const int64_t perThreadLoopCount = totalLoopCount / threadCount;
+	const std::size_t totalLoopCount = (iterations / LANES) + (iterations % LANES != 0);
+	const std::size_t perThreadLoopCount = totalLoopCount / threadCount;
 	const double stepScalar = 1 / static_cast<double>(totalLoopCount * LANES);
 
 	std::vector<std::thread> threads;
@@ -81,6 +81,6 @@ double SimdThreadPi(const int64_t iterations, const std::size_t threadCount)
 	}
 
 	// Be sure to divide by the actual amount of iterations run, not just the requested
-	return sum / (totalLoopCount * LANES);
+	return sum / static_cast<double>(totalLoopCount * LANES);
 }
 } // namespace PiLib

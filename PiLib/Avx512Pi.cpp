@@ -9,14 +9,14 @@ bool IsAvx512PiSupported()
 	return __builtin_cpu_supports("avx512f");
 }
 
-__attribute__((target("avx512f"))) double Avx512Pi(const int64_t iterations)
+__attribute__((target("avx512f"))) double Avx512Pi(const std::size_t iterations)
 {
 	// How many iteraitons are we doing at once in a single vectorized command
 	constexpr int LANES = 512 / 8 / sizeof(double);
 
 	// We will do at least `iterations`, but may do more to avoid
 	// doing any scalar "tail" computations
-	const int64_t loopCount = (iterations / LANES) + (iterations % LANES != 0);
+	const std::size_t loopCount = (iterations / LANES) + (iterations % LANES != 0);
 	const double stepScalar = 1 / static_cast<double>(loopCount * LANES);
 
 	// Broadcast reused scalar values for vector math
@@ -30,7 +30,7 @@ __attribute__((target("avx512f"))) double Avx512Pi(const int64_t iterations)
 	// `indexes` is effectively our vectorized `i`
 	// To account for doing mid-point sums we start the indexes of our calculations at +0.5
 	__m512d indexes = _mm512_set_pd(0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5);
-	for (int64_t i = 0; i < loopCount; i++)
+	for (std::size_t i = 0; i < loopCount; i++)
 	{
 		// x = (i + 0.5) * step
 		// sum += 4.0 / (1.0 + x * x)

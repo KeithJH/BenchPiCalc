@@ -4,14 +4,14 @@
 
 namespace PiLib
 {
-constexpr double SerialPiInternal(const int64_t iterations)
+constexpr double SerialPiInternal(const std::size_t iterations)
 {
 	double sum = 0;
 	double step = 1 / static_cast<double>(iterations);
 
-	for (int64_t i = 0; i < iterations; i++)
+	for (std::size_t i = 0; i < iterations; i++)
 	{
-		const double di = i * 1.0;
+		const double di = static_cast<double>(i) * 1.0;
 		const double x = (di + 0.5) * step;
 
 		sum += 4.0 / (1.0 + x * x);
@@ -20,7 +20,7 @@ constexpr double SerialPiInternal(const int64_t iterations)
 	return step * sum;
 }
 
-double SerialPi(const int64_t iterations)
+double SerialPi(const std::size_t iterations)
 {
 	return SerialPiInternal(iterations);
 }

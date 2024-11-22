@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <numeric>
 #include <omp.h>
 #include <vector>
@@ -6,26 +7,26 @@
 
 namespace PiLib
 {
-double NaiveOmpPi(const int64_t iterations)
+double NaiveOmpPi(const std::size_t iterations)
 {
-	return NaiveOmpPi(iterations, omp_get_max_threads());
+	return NaiveOmpPi(iterations, static_cast<std::size_t>(omp_get_max_threads()));
 }
 
-double NaiveOmpPi(const int64_t iterations, const std::size_t threadCount)
+double NaiveOmpPi(const std::size_t iterations, const std::size_t threadCount)
 {
 	const double step = 1 / static_cast<double>(iterations);
-	std::vector<double> sum (threadCount);
+	std::vector<double> sum(threadCount);
 
-	omp_set_num_threads(threadCount);
-	#pragma omp parallel
+	omp_set_num_threads(static_cast<int>(threadCount));
+#pragma omp parallel
 	{
-		const auto id = omp_get_thread_num();
-		const auto threads = omp_get_num_threads();
+		const auto id = static_cast<std::size_t>(omp_get_thread_num());
+		const auto threads = static_cast<std::size_t>(omp_get_num_threads());
 
 		double innerSum = 0;
-		for (int64_t i = id; i < iterations; i += threads)
+		for (std::size_t i = id; i < iterations; i += threads)
 		{
-			const double x = (i + 0.5) * step;
+			const double x = (static_cast<double>(i) + 0.5) * step;
 			innerSum += 4.0 / (1.0 + x * x);
 		}
 

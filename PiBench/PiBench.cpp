@@ -6,12 +6,12 @@
 
 namespace PiBench
 {
-constexpr int64_t TEST_ITERATION_SIZE = 10;
-constexpr int64_t SMALL_BENCH_ITERATION_SIZE = 4026531839;
+constexpr std::size_t TEST_ITERATION_SIZE = 10;
+constexpr std::size_t SMALL_BENCH_ITERATION_SIZE = 4026531839;
 constexpr double WITHIN_DELTA = 0.01;
 
 template <typename EvaluateFunc>
-void TestPiFunction(bool isSupported, EvaluateFunc evaluateFunc, int64_t iterationCount)
+void TestPiFunction(bool isSupported, EvaluateFunc evaluateFunc, std::size_t iterationCount)
 {
 	if (isSupported)
 	{
@@ -74,7 +74,7 @@ TEST_CASE("ThreadPi calculation is within +/- 0.01", "[pi][ThreadPi]")
 TEST_CASE("SimdThreadPi calculation is within +/- 0.01", "[pi][SimdThreadPi]")
 {
 	// TODO: There's probably a cleaner way...
-	double (*simdThreadPi)(int64_t) = PiLib::SimdThreadPi;
+	double (*simdThreadPi)(std::size_t) = PiLib::SimdThreadPi;
 	TestPiFunction(PiLib::IsSimdThreadPiSupported(), simdThreadPi, TEST_ITERATION_SIZE);
 }
 
@@ -86,7 +86,7 @@ TEST_CASE("KomputePi calculation is within +/- 0.01", "[pi][KomputePi]")
 // Benchmarks
 template <typename EvaluateFunc>
 void BenchmarkPiFunction(std::string &&benchmarkName, bool isSupported, EvaluateFunc evaluateFunc,
-                         int64_t iterationCount)
+                         std::size_t iterationCount)
 {
 	if (isSupported)
 	{
@@ -163,7 +163,7 @@ TEST_CASE("ThreadPi calculation benchmark", "[!benchmark][ThreadPi][pi]")
 
 TEST_CASE("SimdThreadPi calculation benchmark", "[!benchmark][SimdThreadPi][pi]")
 {
-	double (*simdThreadPi)(int64_t) = PiLib::SimdThreadPi;
+	double (*simdThreadPi)(std::size_t) = PiLib::SimdThreadPi;
 	BenchmarkPiFunction("SimdThreadPi", PiLib::IsSimdThreadPiSupported(), simdThreadPi, SMALL_BENCH_ITERATION_SIZE);
 }
 
