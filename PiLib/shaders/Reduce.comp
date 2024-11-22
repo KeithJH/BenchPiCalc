@@ -1,0 +1,54 @@
+#version 450
+#extension GL_KHR_shader_subgroup_arithmetic: enable
+
+layout(local_size_x = 1024) in;
+
+layout(set = 0, binding = 0) buffer a
+{
+	double partialResult[];
+};
+layout(set = 0, binding = 1) buffer b
+{
+	double result[];
+};
+
+layout(push_constant) uniform PushConstants
+{
+	uint partialResultSize;
+}
+push_const;
+
+// TODO: find a way to decrease this to better match number of subgroups, which is not a constant
+shared double scratch[gl_WorkGroupSize.x];
+void main()
+{
+	double localSum = 0.0;
+	for (uint i = gl_LocalInvocationID.x; i < push_const.partialResultSize; i += gl_WorkGroupSize.x)
+	{
+		localSum += partialResult[i];
+	}
+	localSum = subgroupAdd(localSum);
+
+	if (subgroupElect())
+	{
+		scratch[gl_SubgroupID] = localSum;
+	}
+
+	memoryBarrierShared();
+	barrier();
+
+	if (gl_SubgroupID == 0)
+	{
+		localSum = 0;
+		for (uint i = gl_SubgroupInvocationID; i < gl_NumSubgroups; i += gl_SubgroupSize)
+		{
+			localSum += scratch[i];
+		}
+		localSum = subgroupAdd(localSum);
+	}
+
+	if (gl_LocalInvocationID.x == 0)
+	{
+		result[0] = localSum;
+	}
+}

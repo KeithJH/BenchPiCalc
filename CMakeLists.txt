@@ -14,8 +14,7 @@ project ("BenchPiCalc")
 #set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-find_package(Catch2 3 REQUIRED)
+include(FetchContent)
 
 if (MSVC)
   set(WARNING_OPTIONS /W4 /permissive- )

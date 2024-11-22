@@ -1,4 +1,5 @@
 ﻿# CMakeList.txt : CMake project for PiBench
+find_package(Catch2 3 REQUIRED)
 
 add_executable (PiBench "PiBench.cpp")
 target_link_libraries(PiBench PRIVATE PiLib)

@@ -78,6 +78,11 @@ TEST_CASE("SimdThreadPi calculation is within +/- 0.01", "[pi][SimdThreadPi]")
 	TestPiFunction(PiLib::IsSimdThreadPiSupported(), simdThreadPi, TEST_ITERATION_SIZE);
 }
 
+TEST_CASE("KomputePi calculation is within +/- 0.01", "[pi][KomputePi]")
+{
+	CHECK_THAT(PiLib::KomputePi(TEST_ITERATION_SIZE), Catch::Matchers::WithinAbs(std::numbers::pi, WITHIN_DELTA));
+}
+
 // Benchmarks
 template <typename EvaluateFunc>
 void BenchmarkPiFunction(std::string &&benchmarkName, bool isSupported, EvaluateFunc evaluateFunc,
@@ -161,4 +166,13 @@ TEST_CASE("SimdThreadPi calculation benchmark", "[!benchmark][SimdThreadPi][pi]"
 	double (*simdThreadPi)(int64_t) = PiLib::SimdThreadPi;
 	BenchmarkPiFunction("SimdThreadPi", PiLib::IsSimdThreadPiSupported(), simdThreadPi, SMALL_BENCH_ITERATION_SIZE);
 }
+
+TEST_CASE("KomputePi calculation benchmark", "[!benchmark][KomputePi][pi]")
+{
+	BENCHMARK("KomputePi")
+	{
+		return PiLib::KomputePi(SMALL_BENCH_ITERATION_SIZE, 0);
+	};
+}
+
 } // namespace PiBench

@@ -1,3 +1,6 @@
+# Shader compilation to header files
+PiLib/shaders/*.hpp
+
 # Build directory
 out/
 build/

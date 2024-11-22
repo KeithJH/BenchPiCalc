@@ -1,0 +1,52 @@
+#version 450
+#extension GL_KHR_shader_subgroup_arithmetic: enable
+
+layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) buffer a
+{
+	double partialResult[];
+};
+
+// TODO: find a way to decrease this to better match number of subgroups, which is not a constant
+shared double scratch[gl_WorkGroupSize.x];
+void main()
+{
+	// uint i = gl_GlobalInvocationID.x + (gl_GlobalInvocationID.y * gl_NumWorkGroups.x * gl_WorkGroupSize.x);
+	// double step = 1 / (1.0 * gl_NumWorkGroups.x * gl_WorkGroupSize.x * gl_NumWorkGroups.y * gl_WorkGroupSize.y);
+
+	double localSum = 0.0;
+	// double x = (i + 0.5) * step;
+
+	double x = (0.5) / (1.0 * gl_NumWorkGroups.x * gl_WorkGroupSize.x * gl_NumWorkGroups.y * gl_WorkGroupSize.y);
+	x += (gl_GlobalInvocationID.x) /
+	     (1.0 * gl_NumWorkGroups.x * gl_WorkGroupSize.x * gl_NumWorkGroups.y * gl_WorkGroupSize.y);
+	x += (gl_GlobalInvocationID.y) / (1.0 * gl_NumWorkGroups.y * gl_WorkGroupSize.y);
+
+	localSum += 4.0 / (1.0 + x * x);
+	localSum = subgroupAdd(localSum);
+
+	if (subgroupElect())
+	{
+		scratch[gl_SubgroupID] = localSum;
+	}
+
+	memoryBarrierShared();
+	barrier();
+
+	if (gl_SubgroupID == 0)
+	{
+		localSum = 0;
+		for (uint i = gl_SubgroupInvocationID; i < gl_NumSubgroups; i += gl_SubgroupSize)
+		{
+			localSum += scratch[i];
+		}
+		localSum = subgroupAdd(localSum);
+	}
+
+	if (gl_LocalInvocationID.x == 0)
+	{
+		uint index = gl_WorkGroupID.x + (gl_WorkGroupID.y * gl_NumWorkGroups.x);
+		partialResult[index] = localSum;
+	}
+}
