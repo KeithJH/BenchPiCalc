@@ -38,7 +38,9 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 | SimdThreadPi      | 16      | *             | *           |   104.933 |
 
 ## Building
-The project is setup with `CMake` using `vcpkg` as a package manager. `Catch2` is used for testing and benchmarking.
+The project is setup with `CMake` using `FetchContent` for a few packages.
+* [`Catch2`](https://github.com/catchorg/Catch2) is used for testing and benchmarking.
+* [`kompute`](https://github.com/KomputeProject/kompute) is used for running GPU workloads with Vulkan compute shaders.
 
 Presets are created for `g++` as that is the compiler everything is currently test with. The "linux-gcc-profile" preset is meant to be just as optimized as the "release" preset but with debug information, however, on some machines (Intel CPUs?) this causes some performance issues.
 ```

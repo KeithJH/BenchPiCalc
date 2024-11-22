@@ -1,9 +1,8 @@
 ﻿# CMakeList.txt : CMake project for PiLib
-
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(KOMPUTE_OPT_LOG_LEVEL "Debug")
+  set(KOMPUTE_OPT_LOG_LEVEL Debug CACHE STRING "Kompute log level")
 else ()
-  set(KOMPUTE_OPT_LOG_LEVEL "Off")
+  set(KOMPUTE_OPT_LOG_LEVEL Error CACHE STRING "Kompute log level")
 endif ()
 
 FetchContent_Declare(kompute
@@ -17,7 +16,6 @@ FetchContent_Declare(kompute
   SYSTEM
 )
 FetchContent_MakeAvailable(kompute)
-include_directories(${kompute_SOURCE_DIR}/src/include)
 
 vulkan_compile_shader(
     INFILE shaders/PartialSum.comp

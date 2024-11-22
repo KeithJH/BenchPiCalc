@@ -1,5 +1,11 @@
 ﻿# CMakeList.txt : CMake project for PiBench
-find_package(Catch2 3 REQUIRED)
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v3.7.0
+  SYSTEM
+)
+FetchContent_MakeAvailable(Catch2)
 
 add_executable (PiBench "PiBench.cpp")
 target_link_libraries(PiBench PRIVATE PiLib)
