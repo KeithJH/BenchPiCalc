@@ -10,7 +10,7 @@ namespace PiLib
 {
 bool IsSimdThreadPiSupported()
 {
-	return __builtin_cpu_supports("avx512f");
+	return PiLib::IsAvx512PiSupported();
 }
 
 [[gnu::target("avx512f")]] void SimdThunk(const std::size_t loopCountStart, const std::size_t loopCountEnd,

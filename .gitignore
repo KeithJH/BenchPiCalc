@@ -55,3 +55,6 @@ perf.data.old
 # Language server
 .cache/
 compile_commands.json
+
+# Editor files
+.vs/

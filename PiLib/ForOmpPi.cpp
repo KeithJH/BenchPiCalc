@@ -16,7 +16,11 @@ double ForOmpPi(const std::size_t iterations, const std::size_t threadCount)
 
 	omp_set_num_threads(static_cast<int>(threadCount));
 #pragma omp parallel for reduction(+ : sum)
+#ifdef _WINDOWS
+	for (int64_t i = 0; i < static_cast<int64_t>(iterations); i++)
+#else
 	for (std::size_t i = 0; i < iterations; i++)
+#endif
 	{
 		const double x = (static_cast<double>(i) + 0.5) * step;
 		sum += 4.0 / (1.0 + x * x);

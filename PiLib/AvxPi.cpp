@@ -6,10 +6,14 @@ namespace PiLib
 {
 bool IsAvxPiSupported()
 {
+#ifdef _WINDOWS
+	return __check_isa_support(__IA_SUPPORT_VECTOR256);
+#else
 	return __builtin_cpu_supports("avx") && __builtin_cpu_supports("fma");
+#endif
 }
 
-__attribute__((target("avx"), target("fma"))) double AvxPi(const std::size_t iterations)
+[[gnu::target("avx"), gnu::target("fma")]] double AvxPi(const std::size_t iterations)
 {
 	// How many iteraitons are we doing at once in a single vectorized command
 	constexpr int LANES = 256 / 8 / sizeof(double);

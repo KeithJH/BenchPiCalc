@@ -6,10 +6,14 @@ namespace PiLib
 {
 bool IsAvx512PiSupported()
 {
+#ifdef _WINDOWS
+	return __check_isa_support(__IA_SUPPORT_VECTOR512);
+#else
 	return __builtin_cpu_supports("avx512f");
+#endif
 }
 
-__attribute__((target("avx512f"))) double Avx512Pi(const std::size_t iterations)
+[[gnu::target("avx512f")]] double Avx512Pi(const std::size_t iterations)
 {
 	// How many iteraitons are we doing at once in a single vectorized command
 	constexpr int LANES = 512 / 8 / sizeof(double);

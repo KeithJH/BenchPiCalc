@@ -19,6 +19,9 @@ include(FetchContent)
 if (MSVC)
   include("cmake/Warnings.msvc.cmake")
 
+  add_compile_options(/arch:AVX512)
+  add_compile_options(/fp:fast)
+
   if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     include("cmake/Sanitizers.msvc.cmake")
   endif ()
