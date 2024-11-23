@@ -16,9 +16,10 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 * [ForOmpPi](./notes/ForOmpPi.md): Parallel solution using an OpenMP parallel for loop with a reduction clause for sum
 * [ThreadPi](./notes/ThreadPi.md): Parallel solution manually using `std::thread`
 * [SimdThreadPi](./notes/SimdThreadPi.md): Parallel solution manually using `std::thread` and AVX512 vector instructions
+* [KomputePi](./notes/KomputePi.md): General Purpose GPU (GPGPU) solution using Vulkan compute shaders dispatched using `kompute`
 
 ## Results Summary
-4026531839 Iterations on an AMD Ryzen 7 7700X
+4026531839 Iterations on an AMD Ryzen 7 7700X (CPU tests) or a Radeon RX 6900 XT (GPU tests)
 
 | Solution          | threads | -march=native | -ffast-math | time (ms) |
 |-------------------|---------|---------------|-------------|-----------|
@@ -36,11 +37,15 @@ All implementations solve the integration of 4/(1 + x^2) from 0 to 1 using a Rie
 | ForOmpPi          | 16      | yes           | yes         |   103.906 |
 | ThreadPi          | 16      | yes           | *           |   413.089 |
 | SimdThreadPi      | 16      | *             | *           |   104.933 |
+| KomputePi         | GPU     | *             | *           |   159.680 |
 
 ## Building
 The project is setup with `CMake` using `FetchContent` for a few packages.
 * [`Catch2`](https://github.com/catchorg/Catch2) is used for testing and benchmarking.
 * [`kompute`](https://github.com/KomputeProject/kompute) is used for running GPU workloads with Vulkan compute shaders.
+
+It also requires manually downloading and installing:
+  * The [Vulkan SDK](https://vulkan.lunarg.com/) for `kompute` support
 
 Presets are created for `g++` as that is the compiler everything is currently test with. The "linux-gcc-profile" preset is meant to be just as optimized as the "release" preset but with debug information, however, on some machines (Intel CPUs?) this causes some performance issues.
 ```
