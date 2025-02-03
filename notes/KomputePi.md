@@ -10,5 +10,5 @@ KomputePi                                        1             1     159.68 ms
 ```
 
 Additional work worth investigating:
-* Split compute dispatch into smaller chunks for better scaling and to avoid system hangs.
+* Split compute dispatch into smaller chunks for better scaling and to avoid system hangs (needs to be tested on different hardware as overhead is too high for such a "small" problem on performant hardware).
 * Running with sanitizers reveals a potential memory leak, though it appears to be in the `kompute` library itself.
